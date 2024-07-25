@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   memory_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: onurgokkaya <onurgokkaya@student.42.fr>    +#+  +:+       +#+        */
+/*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/01 19:46:58 by ogokkaya          #+#    #+#             */
-/*   Updated: 2024/07/03 00:48:44 by onurgokkaya      ###   ########.fr       */
+/*   Updated: 2024/07/25 12:59:23 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ void	ft_lstdelone_memory(t_block *lst, void (*del)(void *))
 {
 	if (!lst)
 		return ;
-	del(lst->allocate);
+	if(lst->allocate)
+		del(lst->allocate);
 	free(lst);
 }
 

@@ -3,108 +3,94 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ogokkaya <ogokkaya@student.42.fr>          +#+  +:+       +#+        */
+/*   By: onurgokkaya <onurgokkaya@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 15:47:24 by merboyac          #+#    #+#             */
-/*   Updated: 2024/07/16 15:20:20 by ogokkaya         ###   ########.fr       */
+/*   Updated: 2024/07/23 03:18:13 by onurgokkaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 #include <stdio.h>
+#include <./readline/history.h>
+#include <./readline/readline.h>
+#include "open_file.h"
+#include <unistd.h>
 
-// echo bdemirbu 
+static void	file_creation(t_mshell *shell, t_redirection *redirection,
+		t_lexer **lexer)
+{	
+	if ((*lexer)->type == TOKEN_REDIR_APPEND && (*lexer)->next != NULL)
+	{
+		(*lexer) = (*lexer)->next;
+		expander(shell, (*lexer));
+		unquote_the_output(shell, (*lexer));
+		redirection->redir_fd = open_file((*lexer)->content, REDIR_APPEND);
+	}
+	else if ((*lexer)->type == TOKEN_REDIR_IN && (*lexer)->next != NULL)
+	{
+		(*lexer) = (*lexer)->next;
+		redirection->redir_fd = open_file((*lexer)->content, REDIR_IN);
+	}
+	else if ((*lexer)->type == TOKEN_REDIR_OUT && (*lexer)->next != NULL)
+	{
+		(*lexer) = (*lexer)->next;
+		expander(shell, (*lexer));
+		unquote_the_output(shell, (*lexer));
+		redirection->redir_fd = open_file((*lexer)->content, REDIR_OUT);
+	}
+}
 
-// echo "jvdfn" "frıfer" bu iki string arasında bir boşluk olmalı
-
-static void count_arg_for_parser(t_lexer **lexer, int *redir_count, int *arg_count)
+void	redirection(t_mshell *shell, t_command **command, t_lexer **lexer)
 {
-    while((*lexer)->next != NULL && (*lexer)->type != TOKEN_PIPE && (*lexer)->type != TOKEN_HEREDOC)
+    if ((*lexer)->type == TOKEN_HEREDOC && (*lexer)->next != NULL)
     {
-        if((*lexer)->type == TOKEN_WORD)
-            *arg_count += 1;
-        if((*lexer)->type != TOKEN_WORD)
-            *redir_count += 1;
         (*lexer) = (*lexer)->next;
+        heredoc_start(shell ,(*lexer)->content);
     }
-    // heredoc düşünülecek
-    if((*lexer) && (*lexer)->type != TOKEN_PIPE && (*lexer)->type != TOKEN_HEREDOC)
-    {
-        if((*lexer)->type == TOKEN_WORD)
-            *arg_count += 1;
-        if((*lexer)->type != TOKEN_WORD)
-            *redir_count += 1;
-    }
+    else
+        file_creation(shell ,(*command)->redirection, &(*lexer));
+    if((*command)->redirection->next)
+		(*command)->redirection = (*command)->redirection->next;
 }
 
-void parsing_init(t_mshell *shell, t_lexer **lexer)
+void	parser_start(t_mshell *shell, t_command *command, t_lexer *lexer)
 {
-    t_command *command;
-    int arg_count;
-    int redir_count;
+	int	index;
 
-    redir_count = 0;
-    arg_count = 0;
-    count_arg_for_parser(&(*lexer), &redir_count, &arg_count);
-    printf("%d\n", arg_count);
-    printf("%d\n", redir_count);
-    command = ft_calloc(1, sizeof(t_command));
-    if(!command)
-        return(perror("command"), end_malloc(shell), exit(1));
-    my_malloc(shell->block, command);
-    command->args = ft_calloc(arg_count + 1, sizeof(char *));
-    if(!command->args)
-        return(perror("command->args"), end_malloc(shell), exit(1));
-    my_malloc(shell->block, command->args);
-    command->redirection = ft_calloc(redir_count + 1, sizeof(t_redirection));
-    if(!command->redirection)
-        return(perror("command->redirection"), end_malloc(shell), exit(1));
-    my_malloc(shell->block, command->redirection);
-    ft_lstadd_parser(&shell->command , command);
+	index = 0;
+	while (lexer != NULL && command != NULL)
+	{
+		if (lexer->type == TOKEN_WORD)
+		{
+			expander(shell, lexer);
+			unquote_the_output(shell, lexer);
+			command->args[index] = lexer->content;
+			index++;
+		}
+		if (lexer->type == TOKEN_PIPE)
+		{
+			index = 0;
+			pipe(command->pipe_fd);
+			command = command->next;
+		}
+		if (lexer->type != TOKEN_WORD && lexer->type != TOKEN_PIPE)
+			redirection(shell, &command, &lexer);
+		lexer = lexer->next;
+	}
+	// pipe açılırken status düşünülecek
 }
 
-void parser_a(t_mshell *shell, t_lexer *lexer)
+void	parser(t_mshell *shell)
 {
-    int index = 0;
-    while(lexer != NULL)
-    {
-        if(lexer->type == TOKEN_WORD)
-        {
-            expander(shell, lexer);
-            shell->command->args[index] = lexer->content;
-            printf("%s\n", shell->command->args[index++]);
-        }
-        else if(lexer->type == TOKEN_HEREDOC)
-        {
-            lexer = lexer->next;
-            shell->command->redirection->content = lexer->content;
-            printf("%s\n", shell->command->redirection->content);
-            shell->command->redirection->flags = TOKEN_HEREDOC;
-        }
-        lexer = lexer->next;
-    }
+	t_lexer	*lexer;
+
+	lexer = shell->lexer;
+	while (lexer != NULL)
+	{
+		parser_init(shell, &lexer);
+		lexer = lexer->next;
+	}
+	save_restore_fd(STDIN_FILENO, STDOUT_FILENO, 0);
+	parser_start(shell, shell->command, shell->lexer);
 }
-
-void parser(t_mshell *shell)
-{
-    t_lexer *lexer;
-
-    lexer = shell->lexer;
-    while(lexer != NULL)
-    {
-        parsing_init(shell, &lexer);
-        lexer = lexer->next;
-    }
-    parser_a(shell, shell->lexer);
-}
-
-// echo asd eqw >> test.txt | cat -l
-
-// echo
-// asd
-// eqw
-// >>
-// test.txt
-// |
-// cat
-// -l

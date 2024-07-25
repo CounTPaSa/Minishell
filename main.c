@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: onurgokkaya <onurgokkaya@student.42.fr>    +#+  +:+       +#+        */
+/*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 17:39:41 by ogokkaya          #+#    #+#             */
-/*   Updated: 2024/07/13 16:08:28 by onurgokkaya      ###   ########.fr       */
+/*   Updated: 2024/07/25 12:22:12 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <stdio.h>
 #include <./readline/history.h>
 #include <./readline/readline.h>
+#include <stdio.h>
 
 int	shell_start_init(char **env, t_mshell *shell)
 {
@@ -26,13 +26,22 @@ int	shell_start_init(char **env, t_mshell *shell)
 	return (TRUE);
 }
 
+int	shell_start(t_mshell *shell)
+{
+	shell->lexer = NULL;
+	shell->command = NULL;
+	shell->block = malloc_starter();
+	return (TRUE);
+}
+
+
 void	read_line_cycle(t_mshell *shell)
 {
 	shell->input = readline(PROMT);
 	if (!shell->input)
 	{
 		end_malloc(shell);
-		//rl_clear_history();
+		// rl_clear_history();
 		exit(1);
 	}
 	if (shell->input && !ft_isspace(shell->input))
@@ -50,15 +59,30 @@ void	read_line_cycle(t_mshell *shell)
 	add_history(shell->input);
 }
 
+void	end_malloc_loop(t_mshell *shell)
+{
+	// rl_clear_history bu kısıma da eklenebilir
+	ft_lstclear_memory(&shell->block, free);
+}
+
+// input olarak sadece '<<' girilirse syntax error vermeli
 int	loop_shell(t_mshell *shell)
 {
+	t_mshell *shell_clone;
+
+	shell_clone = shell;
 	while (1)
 	{
 		read_line_cycle(shell);
 		lexer(shell);
 		parser(shell);
-		free(shell->input);
+		execute(shell);
+		end_malloc_loop(shell_clone);
+		if (shell_start(shell) == FALSE)
+			return (end_malloc(shell), FALSE);
+		//system("leaks minishell");
 	}
+	return(TRUE);
 }
 
 int	main(int ac, char **av, char **env)

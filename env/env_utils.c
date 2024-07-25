@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ogokkaya <ogokkaya@student.42.fr>          +#+  +:+       +#+        */
+/*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/01 16:27:23 by ogokkaya          #+#    #+#             */
-/*   Updated: 2024/07/02 15:45:52 by ogokkaya         ###   ########.fr       */
+/*   Updated: 2024/07/25 17:14:44 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,12 @@ t_env	*ft_lstnew_env(char *str, char *ptr)
 	if (!new)
 		return (0);
 	new->name = str;
-	new->content = ptr;
+	if (ptr)
+		new->content = ptr;
+	else
+		new->content = NULL;
 	new->next = NULL;
 	return (new);
 }
+
+

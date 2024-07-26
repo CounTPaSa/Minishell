@@ -6,13 +6,13 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 15:29:15 by merboyac          #+#    #+#             */
-/*   Updated: 2024/07/25 17:12:27 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/26 17:18:04 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-t_env   *tmp_start_env(void)
+/* t_env   *tmp_start_env(void)
 {
     t_env *env;
 
@@ -23,7 +23,7 @@ t_env   *tmp_start_env(void)
     env->content = NULL;
     env->next = NULL;
     return (env);
-}
+} */
 
 void if_not_exist(t_mshell *shell, t_env *env, char *name, char *content)
 {

@@ -6,7 +6,7 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 14:02:24 by merboyac          #+#    #+#             */
-/*   Updated: 2024/07/25 17:22:21 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/26 17:02:31 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,4 +34,33 @@ char *fill_content(t_command *command, int i, int j, int equal, t_block *block)
         content = ft_substr(command->args[i], j + 1, ft_strlen(command->args[i]) - j);
     my_malloc(block, content);
     return (content);
+}
+
+ void	only_export(t_env *env)
+{
+	int	i;
+
+	i = 0;
+ 
+    if (!(env->name[0] == '_' && !env->name[1]))
+    {
+	    while (env && env->name[0])
+	    {
+	    	ft_putstr_fd("declare -x ", 1);
+	    	ft_putstr_fd(env->name, 1);
+	    	if (env->content && env->content[0] == '\0')
+	    	{
+	    		ft_putstr_fd("=\"", 1);
+	    		ft_putstr_fd("\"", 1);
+	    	}
+	    	if (env->content && env->content[0] != '\0')
+	    	{
+	    		ft_putstr_fd("=\"", 1);
+	    		ft_putstr_fd(env->content, 1);
+	    		ft_putstr_fd("\"", 1);
+	    	}
+	    	ft_putstr_fd("\n", 1);
+	    	env = env->next;
+	    }
+    }
 }

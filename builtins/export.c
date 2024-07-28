@@ -6,7 +6,7 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:15:19 by merboyac          #+#    #+#             */
-/*   Updated: 2024/07/26 17:18:04 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/28 17:20:09 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ static int is_env_exist(t_env *env, char *name)
 {
     while (env)
     {
-        if (ft_strncmp(env->name, name, ft_strlen(env->name)) == 0) //check for NAME and NAMEASD compare
+        if ((ft_strlen(env->name) == ft_strlen(name)) &&
+             ft_strcmp(env->name, name) == 0)
             return (TRUE);
         env = env->next;
     }
@@ -32,11 +33,11 @@ static int input_of_export(t_mshell *shell, t_command *command)
     char *content;
     t_env *env;
 
+    env = NULL;
     i = 1;
-    equal = 0;
     while (command->args[i])
     {
-        
+        equal = 0;
         j = 0;
         while (command->args[i][j++] )
             if (command->args[i][j] == '=')
@@ -45,9 +46,12 @@ static int input_of_export(t_mshell *shell, t_command *command)
                 break;
             }      
         if (id_validation(command->args[i]) == FALSE)
-            return (FALSE);      
-        name = fill_name(command, i, j, equal, shell->block);
-        content = fill_content(command, i, j, equal, shell->block);
+        {
+            i++;
+            continue;
+        }      
+        name = fill_name(command, i, j, equal);
+        content = fill_content(command, i, j, equal);
         if (ft_strncmp(shell->env->name, name, ft_strlen(name)) == 0)
             change_env(shell, name, content);
         else if (is_env_exist(shell->env, name) == FALSE)
@@ -55,6 +59,8 @@ static int input_of_export(t_mshell *shell, t_command *command)
         else if (equal == 1)
             change_env(shell, name, content);
         i++;
+        my_malloc(shell->block, name);
+        my_malloc(shell->block, content);
     }
     return (TRUE);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: onurgokkaya <onurgokkaya@student.42.fr>    +#+  +:+       +#+        */
+/*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/07 16:45:47 by merboyac          #+#    #+#             */
-/*   Updated: 2024/07/25 16:28:11 by onurgokkaya      ###   ########.fr       */
+/*   Updated: 2024/07/28 16:53:20 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void	unquote_the_output(t_mshell *shell,t_lexer *lexer)
 
 	lexer_content_trim = remove_quotes_from_content(shell,lexer->content, '\"', '\'');
 	lexer->content = lexer_content_trim;
+	my_malloc(shell->block, lexer_content_trim);
 }
 static void	ft_lstadd_parser(t_command **lst, t_command *new)
 {

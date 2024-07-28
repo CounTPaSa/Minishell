@@ -6,7 +6,7 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 17:39:51 by ogokkaya          #+#    #+#             */
-/*   Updated: 2024/07/26 17:05:01 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/28 17:26:34 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,13 +178,15 @@ int						echo(t_command *command);
 int						pwd(void);
 int						env(t_env *env, t_command *command);
 int						unset(t_env *env, t_command *command);
+void					ft_exit(t_mshell *shell, t_command *command);
 int						export(t_mshell *shell);
 void					if_not_exist(t_mshell *shell, t_env *env, char *name, char *content);
 int						id_validation(char *command);
 t_env					*tmp_start_env(void);
 
 // builtins/export_utils_extra.c
-char					*fill_name(t_command *command, int i, int j, int equal, t_block *block);
-char					*fill_content(t_command *command, int i, int j, int equal, t_block *block);
+char					*fill_name(t_command *command, int i, int j, int equal);
+char					*fill_content(t_command *command, int i, int j, int equal);
  void					only_export(t_env *env);
+ void					add_export(t_mshell *shell, char *name, char *content);
 #endif

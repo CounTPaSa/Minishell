@@ -6,7 +6,7 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/01 16:22:49 by ogokkaya          #+#    #+#             */
-/*   Updated: 2024/07/21 13:39:09 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/28 16:13:31 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ int get_env(char **env, t_mshell *shell)
 			return(FALSE);
 		ft_lstadd_back_env(&shell->env, new_env);
 		env++;
+		my_malloc(shell->block, name);
+		my_malloc(shell->block, content);
 	}
 	return(TRUE);
 }

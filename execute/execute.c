@@ -18,8 +18,8 @@ void	builtin_start(t_mshell *shell, t_command *command)
 			unset(shell->env, command);
 		else if(ft_strcmp(command->args[0], "export") == 0)
 			export(shell);
-/* 		else if(ft_strcmp(command->args[0], "exit") == 0)
-			amexit(); */
+		else if(ft_strcmp(command->args[0], "exit") == 0)
+			ft_exit(shell, command);
 }
 
 int	builtin_control(char *command)

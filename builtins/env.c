@@ -6,7 +6,7 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/12 16:43:04 by merboyac          #+#    #+#             */
-/*   Updated: 2024/07/26 13:26:17 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/28 14:44:40 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,17 @@ int env(t_env *env, t_command *command)
         return (FALSE);
     if (!env_controller(command))
         return (FALSE);
-    while (env && env->name && env->content)
+    while (env && env->name)
     {
-        if (ft_strlen(env->content) != 0)
+        if (env->name && env->content == NULL)
+            env = env->next;
+        else if (env->name && env->content)
+        {
             printf("%s=%s\n", env->name, env->content);
-        env = env->next;
+            env = env->next;
+        }
+        else
+            env = env->next;
     }
     return (TRUE);
 }

@@ -6,7 +6,7 @@
 /*   By: merboyac <muheren2004@gmail.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/01 16:27:23 by ogokkaya          #+#    #+#             */
-/*   Updated: 2024/07/26 17:04:20 by merboyac         ###   ########.fr       */
+/*   Updated: 2024/07/28 15:33:15 by merboyac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ t_env	*ft_lstnew_env(char *str, char *ptr)
 	new = ft_calloc(1, sizeof(t_env));
 	if (!new)
 		return (0);
-	new->name = str;
-	new->content = ptr;
+	new->name = ft_strdup(str);
+	new->content = ft_strdup(ptr);
 	new->next = NULL;
 	return (new);
 }
